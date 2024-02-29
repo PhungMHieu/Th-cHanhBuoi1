@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thi Trắc Nghiệm</title>
+<style>
+  /* CSS styles */
+  /* You can customize the styles as needed */
+  body {
+    font-family: Arial, sans-serif;
+  }
+  .question {
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+  <h1>Thi Trắc Nghiệm</h1>
+  <form id="quizForm">
+    <label for="fullName">Họ và tên:</label>
+    <input type="text" id="fullName" name="fullName" required><br><br>
+    
+    <label for="dob">Ngày tháng năm sinh:</label>
+    <input type="date" id="dob" name="dob" required><br><br>
+    
+    <label for="studentId">Mã sinh viên:</label>
+    <input type="text" id="studentId" name="studentId" required><br><br>
+    
+    <label for="class">Lớp:</label>
+    <input type="text" id="class" name="class" required><br><br>
+    
+    <h2>Câu Hỏi</h2>
+    
+    <!-- Questions will be generated dynamically using JavaScript -->
+    <div id="questionsContainer"></div>
+    
+    <button type="submit">Nộp Bài</button>
+  </form>
+  
+  <!-- Result will be displayed here -->
+  <div id="resultContainer"></div>
+
+  <script>
+    // JavaScript logic
+    const questions = [
+      { type: 'trueFalse', question: 'Câu hỏi 1: Đúng hay Sai?', answer: true },
+      { type: 'multipleChoice', question: 'Câu hỏi 2: Chọn đáp án đúng?', options: ['A', 'B', 'C', 'D'], answer: 'A' },
+      { type: 'multipleSelect', question: 'Câu hỏi 3: Chọn các đáp án đúng?', options: ['A', 'B', 'C', 'D'], answer: ['A', 'C'] },
+      { type: 'essay', question: 'Câu hỏi 4: Trả lời tự luận.' }
+      // Add more questions as needed
+    ];
+
+    const quizForm = document.getElementById('quizForm');
+    const questionsContainer = document.getElementById('questionsContainer');
+    const resultContainer = document.getElementById('resultContainer');
+
+    // Function to generate HTML for each question
+    // function generateQuestionHTML(question) {
+    //   let html = '<div class="question">';
+    //   html += `<p>${question.question}</p>`;
+    //   if (question.type === 'trueFalse') {
+    //     html += `<label><input type="radio" name="question${index}" value="true"> Đúng</label>`;
+    //     html += `<label><input type="radio" name="question${index}" value="false"> Sai</label>`;
+    //   } else if (question.type === 'multipleChoice') {
+    //     question.options.forEach((option, optionIndex) => {
+    //       html += `<label><input type="radio" name="question${index}" value="${option}"> ${option}</label>`;
+    //     });
+    //   } else if (question.type === 'multipleSelect') {
+    //     question.options.forEach((option, optionIndex) => {
+    //       html += `<label><input type="checkbox" name="question${index}[]" value="${option}"> ${option}</label>`;
+    //     });
+    //   } else if (question.type === 'essay') {
+    //     html += '<textarea name="essayAnswer" rows="4" cols="50"></textarea>';
+    //   }
+    //   html += '</div>';
+    //   return html;
+    // }
+    // Function to generate HTML for each question
+    function generateQuestionHTML(question, index) {
+    let html = '<div class="question">';
+    html += `<p>${question.question}</p>`;
+    if (question.type === 'trueFalse') {
+        html += `<label><input type="radio" name="question${index}" value="true"> Đúng</label>`;
+        html += `<label><input type="radio" name="question${index}" value="false"> Sai</label>`;
+    } else if (question.type === 'multipleChoice') {
+        question.options.forEach((option, optionIndex) => {
+        html += `<label><input type="radio" name="question${index}" value="${option}"> ${option}</label>`;
+        });
+    } else if (question.type === 'multipleSelect') {
+        question.options.forEach((option, optionIndex) => {
+        html += `<label><input type="checkbox" name="question${index}[]" value="${option}"> ${option}</label>`;
+        });
+    } else if (question.type === 'essay') {
+        html += `<textarea name="essayAnswer${index}" rows="4" cols="50"></textarea>`;
+    }
+    html += '</div>';
+    return html;
+    }
+    // Function to display questions
+    function displayQuestions() {
+      questions.forEach((question, index) => {
+        questionsContainer.innerHTML += generateQuestionHTML(question, index);
+      });
+    }
+
+    // Function to calculate and display the result
+    function showResult(event) {
+      event.preventDefault();
+      let score = 0;
+      questions.forEach((question, index) => {
+        const inputName = `question${index}`;
+        const userAnswer = Array.from(document.getElementsByName(inputName))
+          .filter(input => input.checked || input.type === 'textarea')
+          .map(input => input.type === 'textarea' ? input.value : input.value);
+        
+        if (JSON.stringify(userAnswer) === JSON.stringify(question.answer)) {
+          score++;
+        }
+      });
+      const totalQuestions = questions.length;
+      const resultPercentage = (score / totalQuestions) * 100;
+      resultContainer.innerHTML = `<p>Tổng số câu hỏi: ${totalQuestions}</p>`;
+      resultContainer.innerHTML += `<p>Số câu đúng: ${score}</p>`;
+      resultContainer.innerHTML += `<p>Tỉ lệ: ${resultPercentage.toFixed(2)}%</p>`;
+    }
+
+    // Display questions when the page loads
+    displayQuestions();
+
+    // Add event listener to the form for submitting the quiz
+    quizForm.addEventListener('submit', showResult);
+  </script>
+</body>
+</html>
